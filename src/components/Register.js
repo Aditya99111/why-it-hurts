@@ -6,12 +6,11 @@ import { db } from "../firebase";
 import { GoogleAuthProvider } from "firebase/auth";
 import { useTranslation } from 'react-i18next';
 import './i18n'; // import the i18n configuration
-import Gooogleicon from "./ggle.png"
-
+import Gooogleicon from "./ggle.png";
 
 const Register = () => {
   const { t } = useTranslation();
-  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,9 +18,49 @@ const Register = () => {
   const navigate = useNavigate();
   const { register, loginWithGoogle } = useAuth();
 
+  const allowedDomains = [
+    "gmail.com",
+    "yahoo.com",
+    "hotmail.com",
+    "outlook.com",
+    "live.com",
+    "aol.com",
+    "icloud.com",
+    "mail.ru",
+    "yandex.ru",
+    "qq.com",
+    "163.com",
+    "naver.com",
+    "daum.net",
+    "office365.com",
+    "exchange.com",
+    "msn.com",
+    "edu",
+    "ac.uk",
+    "edu.au",
+    // Add more domains as needed
+  ];
+
+  const getDomain = (email) => {
+    const emailParts = email.split('@');
+    return emailParts.length > 1 ? emailParts[1] : null;
+  };
+
+  const isDomainAllowed = (email) => {
+    const domain = getDomain(email);
+    return allowedDomains.includes(domain);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
+
+    // Validate email domain
+    if (!isDomainAllowed(email)) {
+      setError(t('please_use_a_valid_email_address'));
+      return;
+    }
+
     try {
       const userCredential = await register(email, password);
       const user = userCredential.user;
@@ -131,15 +170,14 @@ const Register = () => {
             fontSize: "14px",
             textDecoration: "none",
             marginTop: "10px",
-            display:"flex",
-            justifyContent:"center",
-            alignItems:"center",
-            gap:"10px"
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px"
           }}
         >
           <img src={Gooogleicon} height={20} width={20} alt="" />
-
-         {t("register_with_google")}
+          {t("register_with_google")}
         </button>
 
         <p>
